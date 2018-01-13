@@ -9,7 +9,7 @@ var numberOfRows = 0;
 var points= [];
 
 //Create the grid variable, takes parameters for rows, columns and the clicakbleGrid function
-var grid = clickableGrid(76,142,function(box,row,col){
+var grid = clickableGrid(61,121,function(box,row,col){
     box.className='clicked';
     var y = numberOfRows - row - 1;
 	points.push(new Victor(col, y));
