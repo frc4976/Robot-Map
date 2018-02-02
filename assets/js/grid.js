@@ -54,9 +54,14 @@ function calculate(){
 		d = c +1;
 		var futurePoint = points[d];
 
+    	if (typeof futurePoint != 'undefined'){
+    		futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
+    	}
+
 		//directionVector = new Victor(-(currentPoint.x - futurePoint.x), -(currentPoint.y - futurePoint.y));
-		outputToFile(currentPoint.x, currentPoint.y);
-    offset_calculate(1.0,1.0,2.0,2.0);
+		outputToFile(currentPoint.x,currentPoint.y,futurePoint.x,futurePoint.y);
+		console.log(currentPoint);
+    
 	}
 }
 
@@ -165,40 +170,32 @@ function offset_calculate(x1,y1,x2,y2){
   point2y = numerator2/denominator2;
 
   //Output final 2 points
-  console.log("Point 1 is (" + roots[0] +","+point1y+")");
-  console.log("Point 2 is (" + roots[1] +","+point2y+")");
+  //console.log("Point 1 is (" + roots[0] +","+point1y+")");
+ // console.log("Point 2 is (" + roots[1] +","+point2y+")");
+
+  //Setup return array in the format (x1, y1, x2, y2);
+  var return_array = [roots[0], point1y, roots[1], point2y];
+
+  //Return the return array
+  return return_array;
 
 }
 
 //CSV Output Code
 itemsNotFormatted = [];
-function outputToFile(xi,yi){
+function outputToFile(x1,y1,x2,y2){
 	for (var e = 0; e < 100; ++e){
-		var scaledX = xi * scaleValue;
-		var scaledY = yi * scaleValue;
 
-		var leftY = scaledY + offset;
-		var rightY = scaledY - offset;
 
-		var xPath = 0;
-		var yPath = 0;
-
-		var tempX = new Victor(scaledX, leftY);
-		var tempY = new Victor(scaledX, rightY);
-
-		xPath = leftVector.distance(tempX);
-		yPath = rightVector.distance(tempY);
-
-		leftVector = tempX;
-		rightVector = tempY;
+		var offests = offset_calculate(x1,y1,x2,y2);
 
 		itemsNotFormatted.push({
-			driveLeftX: scaledX,
-			driveLeftY: leftY,
-			driveRightX: scaledX,
-			driveRightY: rightY,
-			xEncoder: xPath,
-			yEncoder: yPath
+			driveLeftX: offests[0],
+			driveLeftY: offests[1],
+			driveRightX: offests[2],
+			driveRightY: offests[3],
+			xEncoder: 1,
+			yEncoder: 1
 		});
 	}
 }
