@@ -62,52 +62,111 @@ function calculate(){
 
 
 function offset_calculate(x1,y1,x2,y2){
-  //Inital Point
+ //Library Setup
   var Fraction = algebra.Fraction
   var Expression = algebra.Expression;
   var Equation = algebra.Equation;
-  var inital_point = new Victor(x1, y1);
-  var next_point = new Victor(x2, y2);
 
+  //New direction vector between points A and B
   var AB = new Victor((x2-x1), (y2-y1));
 
-  var abx = AB.x;
-  var aby = AB.y;
-
-  var adx = algebra.parse("x");
+  //Create new parametric equations for vector AD 
+  var adx = new Expression("x");
   adx = adx.subtract(x1);
-  var ady = algebra.parse("y")
+  adx = adx.multiply(AB.x);
+  var ady = new Expression("y");
   ady = ady.subtract(y1);
-
-  var expression1 = adx.add(ady);
-  var equation_1 = new Equation(expression1, 0);
-  var equation_12 = equation_1.solveFor("x");
-
-  var adx2 = adx.multiply(adx);
-  var ady2 = ady.multiply(ady);
-
-  var expression3 = adx2.add(ady2);
-  var expression4 = expression3.eval({x : equation_12});
-
-  //INSERT SCALE VALUE HERE
-  var  equation5 = new Equation(expression4, 4);
-  var roots = equation5.solveFor("y");
-  var xroot = new Fraction(parseInt(roots[0] * 1000000), 1);
-
-  console.log(xroot);
+  ady = ady.multiply(AB.y);
 
 
+  //Create an expression for dot product
+  var dot_sum = adx.add(ady);
 
-  console.log("Equation 1 is " + equation_1);
+  //Create and equation for dot product(equals 0 becasue the 2 vectors are perpendicular)
+  var dot_product = new Equation(dot_sum, 0);
 
-  var x_1 = equation_1.solveFor("x");
-  console.log("Our re-arranged equaiton is " + x_1);
-  
+  //Re-arrange dot_product in terms of x
+  var equation_1 = dot_product.solveFor("x");
 
- var x_11 = x_1.eval({y: xroot});
- var x_111 = x_11 / 1000000
+  //Create second expression, magnitude of AD
+  var magnitude_expression = adx.multiply(adx);
+  magnitude_expression = magnitude_expression.add(ady.multiply(ady));
 
-  console.log("The final result is " + x_111);
+
+  //Set second expression equal to the square of the constant offset value
+  var magnitude_equation = new Equation(magnitude_expression, 4); 
+
+  //Substitute equation 1 into magnitude equation
+  var substituted_equation = magnitude_equation.eval({x: equation_1});  
+
+  //Find the 2 roots of the substituted equation
+  var roots = substituted_equation.solveFor("y");
+
+  //Cast the roots to string, then convert them to expression objects
+  var point1x = algebra.parse(String(roots[0]));
+  var point2x = algebra.parse(String(roots[1]));
+
+  //Subsitute first root into equaiton 1
+  var point1y = equation_1.eval({y: point1x});
+  var point2y = equation_1.eval({y: point2x});
+
+  //Convert to Strings
+  point1y = point1y.toString();
+  point2y = point2y.toString();
+
+
+  //Parse result for point1y
+  var flag1 = false;
+  var numerator1 = "";
+  var denominator1 = "";
+
+  for (var i = 0; i < point1y.length; i++) {
+
+	if (point1y.charAt(i) == "/"){
+		flag1 = true;
+		i++;
+	}
+
+	if (flag1 == true){
+		denominator1 = denominator1.concat(String(point1y.charAt(i)));
+	} else {
+		numerator1 = numerator1.concat(String(point1y.charAt(i)));
+	}
+	
+  }
+  numerator1 = parseInt(numerator1);
+  denominator1 = parseInt(denominator1);
+
+  point1y = numerator1/denominator1;
+
+
+  //Parse result for point2y
+  var flag2 = false;
+  var numerator2 = "";
+  var denominator2 = "";
+
+  for (var i = 0; i < point2y.length; i++) {
+
+	if (point2y.charAt(i) == "/"){
+		flag2 = true;
+		i++;
+	}
+
+	if (flag2 == true){
+		denominator2 = denominator2.concat(String(point2y.charAt(i)));
+	} else {
+		numerator2 = numerator2.concat(String(point2y.charAt(i)));
+	}
+	
+  }
+  numerator2 = parseInt(numerator2);
+  denominator2 = parseInt(denominator2);
+
+  point2y = numerator2/denominator2;
+
+  //Output final 2 points
+  console.log("Point 1 is (" + roots[0] +","+point1y+")");
+  console.log("Point 2 is (" + roots[1] +","+point2y+")");
 
 }
 
