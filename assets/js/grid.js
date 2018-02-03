@@ -49,64 +49,72 @@ function clickableGrid( rows, cols, callback){
 
 //Calcualtes the distance between each 2 vectors in the points array
 function calculate(){
-	for (var c = 0; c < points.length;++c){
+	for (var c = 0; c < points.length; c++){
 		var currentPoint = points[c];
-		d = c +1;
+		d = c + 1;
 		var futurePoint = points[d];
-  	if (typeof futurePoint != 'undefined'){
+  	if (typeof futurePoint == 'undefined'){
   		futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
   	}
-    console.log("The current Point is " + currentPoint);
-    console.log("The future Point is " + futurePoint);
-
-  }
-
+        
     //Setup distance calculations for A
-    var a = new Victor((currentPoint.distanceX(futurePoint)), (currentPoint.distanceY(futurePoint)));
+    var a = new Victor((futurePoint.distanceX(currentPoint)), (futurePoint.distanceY(currentPoint)));
 
     //Calcuate magnitude of A
-    a = a.magnitude();
+    var a_magnitude = a.magnitude();
 
+    if (a_magnitude != 1){
+      console.log("we are on a diagonal");
+      //Calcualate offset Value for point A
+      //console.log(currentPoint.x, currentPoint.y, futurePoint.x, futurePoint.y);
+      var offsets1 = offset_calculate(parseInt(currentPoint.x), parseInt(currentPoint.y), parseInt(futurePoint.x), parseInt(futurePoint.y));
 
+      //Setup variables with offset calculated
+      var l = new Victor(offsets1[0], offsets1[1]);
+      var g = new Victor(offsets1[2], offsets1[3]);
 
-    //Calcualate offset Value for point A
-    var offsets1 = offset_calculate(currentPoint.x, currentPoint.y, futurePoint.x, futurePoint.y);
+      //Set up 2 new point for second offfest calcualtion
+      currentPoint = futurePoint;
+      d = d + 1;
+      var futurePoint = points[d];
+      if (typeof futurePoint != 'undefined'){
+        futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
+      }   
 
-    //Setup variables with offset calculated
-    var l = new Victor(offsets1[0], offsets1[1]);
-    var g = new Victor(offsets1[2], offsets1[3]);
+      //Calcualte offset Values for point B
+      var offsets2 = offset_calculate(currentPoint.x, currentPoint.y,futurePoint.x, futurePoint.y);
 
-    //Set up 2 new point for second offfest calcualtion
-    currentPoint = futurePoint;
-    d = d + 1;
-    var futurePoint = points[d];
-    if (typeof futurePoint != 'undefined'){
-      futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
-    }   
+      //Setup second point variables with offset calcualtions
+      var l1 = new Victor(offsets2[0], offsets2[1]);
+      var g1 = new Victor(offsets2[2], offsets2[3]);
 
-    //Calcualte offset Values for point B
-    var offsets2 = offset_calculate(currentPoint.x, currentPoint.y,futurePoint.x, futurePoint.y);
+      //Set up distance calculaitons between the 2 points
+      var b = new Victor((l1.distanceX(l)), (l1.distanceY(l)));
+      var d = new Victor((g1.distanceX(g)), (g1.distanceY(g)));
 
-    //Setup second point variables with offset calcualtions
-    var l1 = new Victor(offsets2[0], offsets2[1]);
-    var g1 = new Victor(offsets2[2], offsets2[3]);
+      //Calcualte the magnitude
+      b_magnitude = b.magnitude();
+      d_magnitude = d.magnitude();
 
-    //Set up distance calculaitons between the 2 points
-    var b = new Victor((l.distanceX(l1)), (l.distanceY(l1)));
-    var c = new Victor((g.distanceX(g1)), (g.distanceY(g1)));
+      console.log("the b x value is" + b.x);
+      console.log("The d x value is " + d.x);
 
-    //Calcualte the magnitude
-    b = b.magnitude();
-    c = c.magnitude();
-
-    //Calculate Motor Outputs
-    var outputLeft = (b/a)*0.1;
-    var outputRight = (c/a)*0.1;
-
-    console.log(outputLeft);
-
-
-		outputToFile(outputLeft,outputRight);    
+      //Calculate Motor Outputs
+      var outputLeft = (b_magnitude/a_magnitude)*0.1;
+      var outputRight = (d_magnitude/a_magnitude)*0.1;
+    } else if ((currentPoint.x - futurePoint.x) == 0) {
+      //If x doesn't change, we are going vertically, so add offset to x values only
+      //Keep motor speed at constant
+      var outputLeft = 0.1;
+      var outputRight = 0.1;
+    } else {
+      //If y doesn't change, then we are going horizontally, so add offset to y values only
+      //Keep motor speed at constant
+      var outputLeft = 0.1;
+      var outputRight = 0.1;
+    }
+		outputToFile(outputLeft,outputRight);  
+  }  
 }
 function offset_calculate(x1,y1,x2,y2){
  //Library Setup
@@ -137,8 +145,7 @@ function offset_calculate(x1,y1,x2,y2){
 
   //Create second expression, magnitude of AD
   var magnitude_expression = adx.multiply(adx);
-  magnitude_expression = magnitude_expression.add(ady.multiply(ady));
-
+  magnitude_expression = magnitude_expression.add(ady.multiply(ady))
 
   //Set second expression equal to the square of the constant offset value
   var magnitude_equation = new Equation(magnitude_expression, 4); 
@@ -194,17 +201,17 @@ function offset_calculate(x1,y1,x2,y2){
 
   for (var i = 0; i < point2y.length; i++) {
 
-	if (point2y.charAt(i) == "/"){
-		flag2 = true;
-		i++;
-	}
+  	if (point2y.charAt(i) == "/"){
+  		flag2 = true;
+  		i++;
+  	}
 
-	if (flag2 == true){
-		denominator2 = denominator2.concat(String(point2y.charAt(i)));
-	} else {
-		numerator2 = numerator2.concat(String(point2y.charAt(i)));
-	}
-	
+  	if (flag2 == true){
+  		denominator2 = denominator2.concat(String(point2y.charAt(i)));
+  	} else {
+  		numerator2 = numerator2.concat(String(point2y.charAt(i)));
+  	}
+  	
   }
   numerator2 = parseInt(numerator2);
   denominator2 = parseInt(denominator2);
@@ -301,7 +308,7 @@ function download(){
 
   // format the data
   itemsNotFormatted.forEach((item) => {
-  	  console.log(item.driveLeft);
+  	  //console.log(item.driveLeft);
       itemsFormatted.push({
           DriveLeftX: item.driveLeftX, 
           DriveLeftY: item.driveLeftY,
