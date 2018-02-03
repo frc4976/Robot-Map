@@ -66,7 +66,6 @@ function calculate(){
     if (a_magnitude != 1){
       console.log("we are on a diagonal");
       //Calcualate offset Value for point A
-      //console.log(currentPoint.x, currentPoint.y, futurePoint.x, futurePoint.y);
       var offsets1 = offset_calculate(parseInt(currentPoint.x), parseInt(currentPoint.y), parseInt(futurePoint.x), parseInt(futurePoint.y));
 
       //Setup variables with offset calculated
@@ -92,12 +91,19 @@ function calculate(){
       var b = new Victor((l1.distanceX(l)), (l1.distanceY(l)));
       var d = new Victor((g1.distanceX(g)), (g1.distanceY(g)));
 
+
+      //var b = Math.sqrt((l1.x - l.x)(l1.x - l.x) + (l1.y - l.y )(l1.y-l.y));
+      //console.log(l1.x);
+
+      console.log("The value of l is "  + l);
+      console.log("The value of l1 is " +  l1);
+      console.log("the distance between l and l1 is " + l.magnitude(l1));
+
       //Calcualte the magnitude
       b_magnitude = b.magnitude();
       d_magnitude = d.magnitude();
 
-      console.log("the b x value is" + b.x);
-      console.log("The d x value is " + d.x);
+      console.log("b magnitude is " + b_magnitude);
 
       //Calculate Motor Outputs
       var outputLeft = (b_magnitude/a_magnitude)*0.1;
