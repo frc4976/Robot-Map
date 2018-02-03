@@ -53,19 +53,61 @@ function calculate(){
 		var currentPoint = points[c];
 		d = c +1;
 		var futurePoint = points[d];
+  	if (typeof futurePoint != 'undefined'){
+  		futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
+  	}
+    console.log("The current Point is " + currentPoint);
+    console.log("The future Point is " + futurePoint);
 
-    	if (typeof futurePoint != 'undefined'){
-    		futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
-    	}
+  }
 
-		//directionVector = new Victor(-(currentPoint.x - futurePoint.x), -(currentPoint.y - futurePoint.y));
-		outputToFile(currentPoint.x,currentPoint.y,futurePoint.x,futurePoint.y);
-		console.log(currentPoint);
-    
-	}
+    //Setup distance calculations for A
+    var a = new Victor((currentPoint.distanceX(futurePoint)), (currentPoint.distanceY(futurePoint)));
+
+    //Calcuate magnitude of A
+    a = a.magnitude();
+
+
+
+    //Calcualate offset Value for point A
+    var offsets1 = offset_calculate(currentPoint.x, currentPoint.y, futurePoint.x, futurePoint.y);
+
+    //Setup variables with offset calculated
+    var l = new Victor(offsets1[0], offsets1[1]);
+    var g = new Victor(offsets1[2], offsets1[3]);
+
+    //Set up 2 new point for second offfest calcualtion
+    currentPoint = futurePoint;
+    d = d + 1;
+    var futurePoint = points[d];
+    if (typeof futurePoint != 'undefined'){
+      futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
+    }   
+
+    //Calcualte offset Values for point B
+    var offsets2 = offset_calculate(currentPoint.x, currentPoint.y,futurePoint.x, futurePoint.y);
+
+    //Setup second point variables with offset calcualtions
+    var l1 = new Victor(offsets2[0], offsets2[1]);
+    var g1 = new Victor(offsets2[2], offsets2[3]);
+
+    //Set up distance calculaitons between the 2 points
+    var b = new Victor((l.distanceX(l1)), (l.distanceY(l1)));
+    var c = new Victor((g.distanceX(g1)), (g.distanceY(g1)));
+
+    //Calcualte the magnitude
+    b = b.magnitude();
+    c = c.magnitude();
+
+    //Calculate Motor Outputs
+    var outputLeft = (b/a)*0.1;
+    var outputRight = (c/a)*0.1;
+
+    console.log(outputLeft);
+
+
+		outputToFile(outputLeft,outputRight);    
 }
-
-
 function offset_calculate(x1,y1,x2,y2){
  //Library Setup
   var Fraction = algebra.Fraction
@@ -180,20 +222,16 @@ function offset_calculate(x1,y1,x2,y2){
   return return_array;
 
 }
-
 //CSV Output Code
 itemsNotFormatted = [];
-function outputToFile(x1,y1,x2,y2){
+function outputToFile(outputLeft, outputRight){
 	for (var e = 0; e < 100; ++e){
 
-
-		var offests = offset_calculate(x1,y1,x2,y2);
-
 		itemsNotFormatted.push({
-			driveLeftX: offests[0],
-			driveLeftY: offests[1],
-			driveRightX: offests[2],
-			driveRightY: offests[3],
+			driveLeftX: outputLeft,
+			driveLeftY: outputRight,
+			driveRightX: 1,
+			driveRightY: 1,
 			xEncoder: 1,
 			yEncoder: 1
 		});
