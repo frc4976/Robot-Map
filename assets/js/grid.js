@@ -9,6 +9,7 @@ var numberOfRows = 0;
 var points= [];
 var scaleValue = 2.417;
 var offset = 0.025;
+var motor_constant = 0.1;
 
 var leftVector = new Victor(0,0);
 var rightVector = new Victor(0,0);
@@ -17,8 +18,8 @@ var rightVector = new Victor(0,0);
 
 //Create the grid variable, takes parameters for rows, columns and the clicakbleGrid function
 var grid = clickableGrid(10,20,function(box,row,col){
-    box.className='clicked';
-    var y = numberOfRows - row - 1;
+  box.className='clicked';
+  var y = numberOfRows - row - 1;
 	points.push(new Victor(col, y));
 
 });
@@ -71,36 +72,53 @@ function calculate(){
     //Setup our initial point
     var currentPoint = points[i];
 
-    //Set up our next point, if we are at last point, next point = current point
+    //If we are at the last point of the array, do nothing
     if (i == (points.length - 1)){ }
     else {
+      //If we are not at the last point of the array, do code
       var futurePoint = points[i+1];
       var currentVector = new Victor(currentPoint.x, currentPoint.y);
       var futureVector = new Victor(futurePoint.x, futurePoint.y);
-      var abVector = new Victor((futurePoint.x - currentPoint.x), (currentPoint.x - futurePoint.x));
-
-      console.log("the vertial distance is " + currentVector.distanceY(futureVector));
-      console.log("the horziotal distance is " + currentVector.distanceX(futureVector));
+      var abVector = new Victor((futureVector.x - currentVector.x), (futureVector.y - currentVector.y));
 
 
+      if(abVector.length() != 1){
+        //We are going diagonally
+        var initial_offsets = offset_calculate(currentVector.x, currentVector.y, futureVector.x , futureVector.y);
+        var point_c = new Victor(initial_offsets[0], initial_offsets[1]);
+        var point_d = new Victor(initial_offsets[2], initial_offsets[3]);
 
-      if(abs(abVector.length()) != 1){
-       console.log("we are going diagonally");
+        var second_offsets = offset_calculate(futureVector.x, futureVector.y,  currentVector.x , currentVector.y);
+        var point_e = new Victor(second_offsets[0], second_offsets[1]);
+        var point_f = new Victor(second_offsets[2], second_offsets[3]);
+
+        var ce_length = point_c.length(point_e);
+        var df_length = point_d.length(point_f);
+
+        var left_motor_output = (df_length/abVector.length()) * motor_constant;
+        var right_motor_output = (ce_length/abVector.length()) * motor_constant;
+
+        
       } 
-      if (currentVector.x == futureVector.x){
-        console.log("we are going vertically");
+      else if (currentVector.x == futureVector.x){
+        //We are going vertically
+        var left_motor_output = abVector.length() * motor_constant;
+        var right_motor_output = abVector.length() * motor_constant;
       } 
-      if (currentVector.y == futureVector.y){
-        console.log("we are going horizontally yay!");
-      } 
+      else if (currentVector.y == futureVector.y){
+        //We are going horizontally
+        var left_motor_output = abVector.length() * motor_constant;
+        var right_motor_output = abVector.length() * motor_constant;
+      } else {
+        console.log("Click adjacent boxes only");
+      }
+
+      console.log("The left motor output is " + left_motor_output);
+      console.log("The right motor output is "  + right_motor_output);
 
     }
-
-   
-    //var offsets = offset_calculate(currentPoint.x, currentPoint.y, futurePoint.x, futurePoint.y);
-
-
-}
+  }
+  outputToFile();
 }
 function offset_calculate(x1,y1,x2,y2){
  //Library Setup
@@ -217,16 +235,16 @@ function offset_calculate(x1,y1,x2,y2){
 }
 //CSV Output Code
 itemsNotFormatted = [];
-function outputToFile(outputLeft, outputRight){
+function outputToFile(){
 	for (var e = 0; e < 100; ++e){
 
 		itemsNotFormatted.push({
-			driveLeftX: outputLeft,
-			driveLeftY: outputRight,
-			driveRightX: 1,
-			driveRightY: 1,
-			xEncoder: 1,
-			yEncoder: 1
+			leftOuput: 1,
+			rightOutput: 1,
+			leftPosition: 1,
+			rightPosition: 1,
+			leftVelocity: 1,
+			rightVelocity: 1
 		});
 	}
 }
@@ -280,12 +298,12 @@ function exportCSVFile(headers, items, fileTitle) {
 
 function download(){
   var headers = {
-      driveRightX: 'driveRightX', 
-      driveRightY: 'driveRightY',
-      driveLeftX: 'driveLeftX',
-      DriveLeftY: 'driveLeftY',
-      xEncoder: 'xEncoder',
-      yEncoder: 'yEncoder'
+      leftOuptut: 'Left Output', 
+      rightOutput: 'Right Output',
+      leftPosition: 'Left Poistion',
+      rightPosition: 'Right Poisiton',
+      leftVelocity: 'Left Velocity',
+      rightVelocity: 'Right Velocity'
 
   };
 
@@ -296,12 +314,12 @@ function download(){
   itemsNotFormatted.forEach((item) => {
   	  //console.log(item.driveLeft);
       itemsFormatted.push({
-          DriveLeftX: item.driveLeftX, 
-          DriveLeftY: item.driveLeftY,
-          DriveRightX: item.driveRightX,
-          DriveRightY: item.driveRightY,
-          xEncoder: item.xEncoder,
-          yEncoder: item.yEncoder
+          leftOuput: item.leftOuput, 
+          rightOutput: item.rightOutput,
+          leftPosition: item.leftPosition,
+          rightPosition: item.rightPosition,
+          leftVelocity: item.leftVelocity,
+          rightVelocity: item.rightVelocity
       });
   });
 
