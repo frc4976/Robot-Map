@@ -39,88 +39,68 @@ function clickableGrid( rows, cols, callback){
 	        var cell = tr.appendChild(document.createElement('td'));
 	        cell.addEventListener('click',(function(box,r,c){
 	            return function(){
-	                callback(box,r,c);
-	            }
+	             callback(box,r,c);
+              }
 	        })(cell,r,c),false);
 	    }
 	}
 	return grid;
 }
 
-//Calcualtes the distance between each 2 vectors in the points array
+//TODO: Fix function, only removes first istance of reapeat
+function clean_array(){
+  for (var i = 0; i < points.length; i++) {
+    var current_value = points[i];
+    if (i != 0){
+      var d = i - 1;
+      if ((current_value.x == points[d].x) && (current_value.y == points[d].y)){
+        points.splice(i,1);
+      } 
+    }   
+  }
+  return true;
+}
+
 function calculate(){
-	for (var c = 0; c < points.length; c++){
-		var currentPoint = points[c];
-		d = c + 1;
-		var futurePoint = points[d];
-  	if (typeof futurePoint == 'undefined'){
-  		futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
-  	}
-        
-    //Setup distance calculations for A
-    var a = new Victor((futurePoint.distanceX(currentPoint)), (futurePoint.distanceY(currentPoint)));
 
-    //Calcuate magnitude of A
-    var a_magnitude = a.magnitude();
-
-    if (a_magnitude != 1){
-      console.log("we are on a diagonal");
-      //Calcualate offset Value for point A
-      var offsets1 = offset_calculate(parseInt(currentPoint.x), parseInt(currentPoint.y), parseInt(futurePoint.x), parseInt(futurePoint.y));
-
-      //Setup variables with offset calculated
-      var l = new Victor(offsets1[0], offsets1[1]);
-      var g = new Victor(offsets1[2], offsets1[3]);
-
-      //Set up 2 new point for second offfest calcualtion
-      currentPoint = futurePoint;
-      d = d + 1;
-      var futurePoint = points[d];
-      if (typeof futurePoint != 'undefined'){
-        futurePoint = new Victor((currentPoint.x + 1), (currentPoint.y + 1));
-      }   
-
-      //Calcualte offset Values for point B
-      var offsets2 = offset_calculate(currentPoint.x, currentPoint.y,futurePoint.x, futurePoint.y);
-
-      //Setup second point variables with offset calcualtions
-      var l1 = new Victor(offsets2[0], offsets2[1]);
-      var g1 = new Victor(offsets2[2], offsets2[3]);
-
-      //Set up distance calculaitons between the 2 points
-      var b = new Victor((l1.distanceX(l)), (l1.distanceY(l)));
-      var d = new Victor((g1.distanceX(g)), (g1.distanceY(g)));
+  var clean = clean_array();
 
 
-      //var b = Math.sqrt((l1.x - l.x)(l1.x - l.x) + (l1.y - l.y )(l1.y-l.y));
-      //console.log(l1.x);
+  for (var i = 0; i < points.length; i++) {
 
-      console.log("The value of l is "  + l);
-      console.log("The value of l1 is " +  l1);
-      console.log("the distance between l and l1 is " + l.magnitude(l1));
+    //Setup our initial point
+    var currentPoint = points[i];
 
-      //Calcualte the magnitude
-      b_magnitude = b.magnitude();
-      d_magnitude = d.magnitude();
+    //Set up our next point, if we are at last point, next point = current point
+    if (i == (points.length - 1)){ }
+    else {
+      var futurePoint = points[i+1];
+      var currentVector = new Victor(currentPoint.x, currentPoint.y);
+      var futureVector = new Victor(futurePoint.x, futurePoint.y);
+      var abVector = new Victor((futurePoint.x - currentPoint.x), (currentPoint.x - futurePoint.x));
 
-      console.log("b magnitude is " + b_magnitude);
+      console.log("the vertial distance is " + currentVector.distanceY(futureVector));
+      console.log("the horziotal distance is " + currentVector.distanceX(futureVector));
 
-      //Calculate Motor Outputs
-      var outputLeft = (b_magnitude/a_magnitude)*0.1;
-      var outputRight = (d_magnitude/a_magnitude)*0.1;
-    } else if ((currentPoint.x - futurePoint.x) == 0) {
-      //If x doesn't change, we are going vertically, so add offset to x values only
-      //Keep motor speed at constant
-      var outputLeft = 0.1;
-      var outputRight = 0.1;
-    } else {
-      //If y doesn't change, then we are going horizontally, so add offset to y values only
-      //Keep motor speed at constant
-      var outputLeft = 0.1;
-      var outputRight = 0.1;
+
+
+      if(abs(abVector.length()) != 1){
+       console.log("we are going diagonally");
+      } 
+      if (currentVector.x == futureVector.x){
+        console.log("we are going vertically");
+      } 
+      if (currentVector.y == futureVector.y){
+        console.log("we are going horizontally yay!");
+      } 
+
     }
-		outputToFile(outputLeft,outputRight);  
-  }  
+
+   
+    //var offsets = offset_calculate(currentPoint.x, currentPoint.y, futurePoint.x, futurePoint.y);
+
+
+}
 }
 function offset_calculate(x1,y1,x2,y2){
  //Library Setup
