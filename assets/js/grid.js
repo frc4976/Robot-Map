@@ -8,8 +8,10 @@ var lastClicked;
 var numberOfRows = 0;
 var points= [];
 var scaleValue = 2.417;
-var offset = 0.025;
+var offset = 2;
 var motor_constant = 0.1;
+var left_positon = 0;
+var right_position = 0;
 
 var leftVector = new Victor(0,0);
 var rightVector = new Victor(0,0);
@@ -66,6 +68,12 @@ function calculate(){
 
   var clean = clean_array();
 
+  //Robot Orientation{0: undefined, 1: vertical, 2: horizontal, 3: diagonal}
+  var robot_orientation = 0;
+  var left_position = 0;
+  var right_position  = 0;
+  var left_encoder = 0;
+  var right_encoder = 0;
 
   for (var i = 0; i < points.length; i++) {
 
@@ -81,41 +89,66 @@ function calculate(){
       var futureVector = new Victor(futurePoint.x, futurePoint.y);
       var abVector = new Victor((futureVector.x - currentVector.x), (futureVector.y - currentVector.y));
 
+      console.log(offset_calculate(currentVector.x, currentVector.y, futureVector.x, futureVector.y));
+      console.log(offset_calculate(futureVector.x, futureVector.y, currentVector.x ,currentVector.y));
 
       if(abVector.length() != 1){
         //We are going diagonally
-        var initial_offsets = offset_calculate(currentVector.x, currentVector.y, futureVector.x , futureVector.y);
-        var point_c = new Victor(initial_offsets[0], initial_offsets[1]);
-        var point_d = new Victor(initial_offsets[2], initial_offsets[3]);
+        // if (robot_orientation == 1){
+        //   // Our orientaiton is vertical
+        //   var point_c = new Victor((currentVector.x + offset), currentVector.y);
+        //   var point_d = new Victor((currentVector.x - offset), currentVector.y);
 
-        var second_offsets = offset_calculate(futureVector.x, futureVector.y,  currentVector.x , currentVector.y);
-        var point_e = new Victor(second_offsets[0], second_offsets[1]);
-        var point_f = new Victor(second_offsets[2], second_offsets[3]);
+        //   var second_offsets = offset_calculate(futureVector.x, futureVector.y, currentVector.x, currentVector.y);
+        //   var point_e = new Victor(second_offsets[0], second_offsets[1]);
+        //   var point_f = new Victor(second_offsets[2], second_offsets[3]);
 
-        var ce_length = point_c.length(point_e);
-        var df_length = point_d.length(point_f);
+        //   var ce_length = get_distance(point_c.x, point_c.y, point_e.x, point_e.y);
+        //   var df_length = get_distance(point_d.x, point_d.y, point_f.x, point_f.y);
 
-        var left_motor_output = (df_length/abVector.length()) * motor_constant;
-        var right_motor_output = (ce_length/abVector.length()) * motor_constant;
+        //   console.log("pont c is " + point_c);
+        //   console.log("point d is " + point_d);
+        //   console.log("point e is " + point_e);
+        //   console.log("point f is " + point_f);
+        //   console.log("ce_length is " + ce_length);
+        //   console.log("df_length is " + df_length);
 
-        
+        // } else if (robot_orientation  == 2){
+        //   // Our orientaiton before the digaitonal is horizontal
+
+        // } else if (robot_orientation  == 3){
+        //   var initial_offsets = offset_calculate(currentVector.x, currentVector.y, futureVector.x , futureVector.y);
+        //   var point_c = new Victor(initial_offsets[0], initial_offsets[1]);
+        //   var point_d = new Victor(initial_offsets[2], initial_offsets[3]);
+
+        //   var second_offsets = offset_calculate(futureVector.x, futureVector.y,  currentVector.x , currentVector.y);
+        //   var point_e = new Victor(second_offsets[0], second_offsets[1]);
+        //   var point_f = new Victor(second_offsets[2], second_offsets[3]);
+
+        //   var left_motor_output = (df_length/abVector.length()) * motor_constant;
+        //   var right_motor_output = (ce_length/abVector.length()) * motor_constant;  
+
+        //   left_position = left_positon + df_length;
+        //   right_position = right_position + ce_length;
+        // }
+       
+
       } 
       else if (currentVector.x == futureVector.x){
         //We are going vertically
+        robot_orientation = 1;
         var left_motor_output = abVector.length() * motor_constant;
         var right_motor_output = abVector.length() * motor_constant;
       } 
       else if (currentVector.y == futureVector.y){
         //We are going horizontally
+        robot_orientation = 2;
         var left_motor_output = abVector.length() * motor_constant;
         var right_motor_output = abVector.length() * motor_constant;
       } else {
         console.log("Click adjacent boxes only");
       }
-
-      console.log("The left motor output is " + left_motor_output);
-      console.log("The right motor output is "  + right_motor_output);
-
+      
     }
   }
   outputToFile();
@@ -129,44 +162,63 @@ function offset_calculate(x1,y1,x2,y2){
   //New direction vector between points A and B
   var AB = new Victor((x2-x1), (y2-y1));
 
+
   //Create new parametric equations for vector AD 
   var adx = new Expression("x");
   adx = adx.subtract(x1);
+  var distance = adx;
   adx = adx.multiply(AB.x);
   var ady = new Expression("y");
   ady = ady.subtract(y1);
+  var distance2 = ady;
   ady = ady.multiply(AB.y);
+
 
 
   //Create an expression for dot product
   var dot_sum = adx.add(ady);
 
+
+
   //Create and equation for dot product(equals 0 becasue the 2 vectors are perpendicular)
   var dot_product = new Equation(dot_sum, 0);
+
 
   //Re-arrange dot_product in terms of x
   var equation_1 = dot_product.solveFor("x");
 
   //Create second expression, magnitude of AD
-  var magnitude_expression = adx.multiply(adx);
-  magnitude_expression = magnitude_expression.add(ady.multiply(ady))
+  var magnitude_expression = distance.multiply(distance);
+
+
+  magnitude_expression = magnitude_expression.add(distance2 .multiply(distance2))
+
 
   //Set second expression equal to the square of the constant offset value
   var magnitude_equation = new Equation(magnitude_expression, 4); 
 
+  console.log(magnitude_equation.toString());
+
+
+
   //Substitute equation 1 into magnitude equation
-  var substituted_equation = magnitude_equation.eval({x: equation_1});  
+  var substituted_equation = magnitude_equation.eval({x: equation_1}); 
+
 
   //Find the 2 roots of the substituted equation
   var roots = substituted_equation.solveFor("y");
+
+
 
   //Cast the roots to string, then convert them to expression objects
   var point1x = algebra.parse(String(roots[0]));
   var point2x = algebra.parse(String(roots[1]));
 
+
   //Subsitute first root into equaiton 1
   var point1y = equation_1.eval({y: point1x});
   var point2y = equation_1.eval({y: point2x});
+
 
   //Convert to Strings
   point1y = point1y.toString();
@@ -198,6 +250,7 @@ function offset_calculate(x1,y1,x2,y2){
   point1y = numerator1/denominator1;
 
 
+
   //Parse result for point2y
   var flag2 = false;
   var numerator2 = "";
@@ -222,10 +275,6 @@ function offset_calculate(x1,y1,x2,y2){
 
   point2y = numerator2/denominator2;
 
-  //Output final 2 points
-  //console.log("Point 1 is (" + roots[0] +","+point1y+")");
- // console.log("Point 2 is (" + roots[1] +","+point2y+")");
-
   //Setup return array in the format (x1, y1, x2, y2);
   var return_array = [roots[0], point1y, roots[1], point2y];
 
@@ -233,7 +282,20 @@ function offset_calculate(x1,y1,x2,y2){
   return return_array;
 
 }
+
+function get_distance(x1, y1, x2, y2) {
+  var xs = x2 - x1,
+      ys = y2 - y1;   
+  
+  xs *= xs;
+  ys *= ys;
+   
+  return Math.sqrt( xs + ys );
+};
+
 //CSV Output Code
+//DO NOT TOUCH OR EDIT
+//IDK HOW IT WORKS BUT IT DOES SO DON'T TOUCH ANTYTHING OR IT WILL BREAK!!!
 itemsNotFormatted = [];
 function outputToFile(){
 	for (var e = 0; e < 100; ++e){
@@ -327,3 +389,4 @@ function download(){
 
   exportCSVFile(headers, itemsFormatted, fileTitle); // call the exportCSVFile() function to process the JSON and trigger the download
 }
+
