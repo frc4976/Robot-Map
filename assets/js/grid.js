@@ -8,7 +8,7 @@ var lastClicked;
 var numberOfRows = 0;
 var points= [];
 var scaleValue = 2.417;
-var offset = 2;
+var offset = 1;
 var motor_constant = 0.1;
 var left_positon = 0;
 var right_position = 0;
@@ -68,87 +68,36 @@ function calculate(){
 
   var clean = clean_array();
 
-  //Robot Orientation{0: undefined, 1: vertical, 2: horizontal, 3: diagonal}
-  var robot_orientation = 0;
-  var left_position = 0;
-  var right_position  = 0;
-  var left_encoder = 0;
-  var right_encoder = 0;
-
   for (var i = 0; i < points.length; i++) {
 
     //Setup our initial point
-    var currentPoint = points[i];
+    
 
     //If we are at the last point of the array, do nothing
-    if (i == (points.length - 1)){ }
+    if (i == (points.length - 1)){ 
+    	var currentPoint = points[i];
+    	var futurePoint = points[i-1];
+     	var futurePoints = new Victor(currentPoint.x, currentPoint.y);
+     	var currentPoints = new Victor(futurePoint.x, futurePoint.y);
+
+     	var point_c = new Victor((futurePoints.x + offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y + offset*(futurePoints.x - currentPoints.x)));
+    	var point_d = new Victor((futurePoints.x - offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y - offset*(futurePoints.x - currentPoints.x)));
+
+      	console.log(points);
+      	console.log("The current point is " + currentPoint + " the future point is " + futurePoint + " and i is " + i);
+      	console.log("Points C is "  + point_c + " and point d is " + point_d);
+    }
     else {
       //If we are not at the last point of the array, do code
-      var futurePoint = points[i+1];
-      var currentVector = new Victor(currentPoint.x, currentPoint.y);
-      var futureVector = new Victor(futurePoint.x, futurePoint.y);
-      var abVector = new Victor((futureVector.x - currentVector.x), (futureVector.y - currentVector.y));
+     	var currentPoint = points[i];
+    	var futurePoint = points[i+1];
+     	var futurePoints = new Victor(currentPoint.x, currentPoint.y);
+     	var currentPoints = new Victor(futurePoint.x, futurePoint.y);
 
-      console.log(offset_calculate(currentVector.x, currentVector.y, futureVector.x, futureVector.y));
-      console.log(offset_calculate(futureVector.x, futureVector.y, currentVector.x ,currentVector.y));
+    	var point_c = new Victor((futurePoints.x + offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y + offset*(futurePoints.x - currentPoints.x)));
+    	var point_d = new Victor((futurePoints.x - offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y - offset*(futurePoints.x - currentPoints.x)));
 
-      if(abVector.length() != 1){
-        //We are going diagonally
-        // if (robot_orientation == 1){
-        //   // Our orientaiton is vertical
-        //   var point_c = new Victor((currentVector.x + offset), currentVector.y);
-        //   var point_d = new Victor((currentVector.x - offset), currentVector.y);
-
-        //   var second_offsets = offset_calculate(futureVector.x, futureVector.y, currentVector.x, currentVector.y);
-        //   var point_e = new Victor(second_offsets[0], second_offsets[1]);
-        //   var point_f = new Victor(second_offsets[2], second_offsets[3]);
-
-        //   var ce_length = get_distance(point_c.x, point_c.y, point_e.x, point_e.y);
-        //   var df_length = get_distance(point_d.x, point_d.y, point_f.x, point_f.y);
-
-        //   console.log("pont c is " + point_c);
-        //   console.log("point d is " + point_d);
-        //   console.log("point e is " + point_e);
-        //   console.log("point f is " + point_f);
-        //   console.log("ce_length is " + ce_length);
-        //   console.log("df_length is " + df_length);
-
-        // } else if (robot_orientation  == 2){
-        //   // Our orientaiton before the digaitonal is horizontal
-
-        // } else if (robot_orientation  == 3){
-        //   var initial_offsets = offset_calculate(currentVector.x, currentVector.y, futureVector.x , futureVector.y);
-        //   var point_c = new Victor(initial_offsets[0], initial_offsets[1]);
-        //   var point_d = new Victor(initial_offsets[2], initial_offsets[3]);
-
-        //   var second_offsets = offset_calculate(futureVector.x, futureVector.y,  currentVector.x , currentVector.y);
-        //   var point_e = new Victor(second_offsets[0], second_offsets[1]);
-        //   var point_f = new Victor(second_offsets[2], second_offsets[3]);
-
-        //   var left_motor_output = (df_length/abVector.length()) * motor_constant;
-        //   var right_motor_output = (ce_length/abVector.length()) * motor_constant;  
-
-        //   left_position = left_positon + df_length;
-        //   right_position = right_position + ce_length;
-        // }
-       
-
-      } 
-      else if (currentVector.x == futureVector.x){
-        //We are going vertically
-        robot_orientation = 1;
-        var left_motor_output = abVector.length() * motor_constant;
-        var right_motor_output = abVector.length() * motor_constant;
-      } 
-      else if (currentVector.y == futureVector.y){
-        //We are going horizontally
-        robot_orientation = 2;
-        var left_motor_output = abVector.length() * motor_constant;
-        var right_motor_output = abVector.length() * motor_constant;
-      } else {
-        console.log("Click adjacent boxes only");
-      }
-      
+      	console.log("Point C is "  + point_c + " and point d is " + point_d);
     }
   }
   outputToFile();
