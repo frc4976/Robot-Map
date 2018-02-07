@@ -83,9 +83,8 @@ function calculate(){
      	var point_c = new Victor((futurePoints.x + offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y + offset*(futurePoints.x - currentPoints.x)));
     	var point_d = new Victor((futurePoints.x - offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y - offset*(futurePoints.x - currentPoints.x)));
 
-      	console.log(points);
-      	console.log("The current point is " + currentPoint + " the future point is " + futurePoint + " and i is " + i);
-      	console.log("Points C is "  + point_c + " and point d is " + point_d);
+     
+      	console.log("Point C is "  + point_c + " and point d is " + point_d);
     }
     else {
       //If we are not at the last point of the array, do code
