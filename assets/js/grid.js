@@ -8,10 +8,10 @@ var lastClicked;
 var numberOfRows = 0;
 var points= [];
 var scaleValue = 2.417;
-var offset = 1;
-var motor_constant = 0.1;
-var left_positon = 0;
-var right_position = 0;
+var offset = 0.2;
+var motor_constant = 0.9;
+var left_positions = [];
+var right_positions = [];
 
 var leftVector = new Victor(0,0);
 var rightVector = new Victor(0,0);
@@ -64,167 +64,112 @@ function clean_array(){
   return true;
 }
 
+function distance_calculate(point_1, point_2){
+
+
+}
+
 function calculate(){
 
   var clean = clean_array();
 
+
+  //Calcualte left and right offset values
   for (var i = 0; i < points.length; i++) {
 
     //Setup our initial point
+    point_a = 0;
+    point_b = 0;
     
 
     //If we are at the last point of the array, do nothing
-    if (i == (points.length - 1)){ 
-    	var currentPoint = points[i];
-    	var futurePoint = points[i-1];
-     	var futurePoints = new Victor(currentPoint.x, currentPoint.y);
-     	var currentPoints = new Victor(futurePoint.x, futurePoint.y);
+    if (i == 0){ 
+      //
+      point_a = points[i+1];
+      point_b = points[i];
 
-     	var point_c = new Victor((futurePoints.x + offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y + offset*(futurePoints.x - currentPoints.x)));
-    	var point_d = new Victor((futurePoints.x - offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y - offset*(futurePoints.x - currentPoints.x)));
+      offset_calculate(point_a, point_b);
 
-     
-      	console.log("Point C is "  + point_c + " and point d is " + point_d);
     }
     else {
-      //If we are not at the last point of the array, do code
-     	var currentPoint = points[i];
-    	var futurePoint = points[i+1];
-     	var futurePoints = new Victor(currentPoint.x, currentPoint.y);
-     	var currentPoints = new Victor(futurePoint.x, futurePoint.y);
+      point_a = points[i-1];
+      point_b = points[i];
 
-    	var point_c = new Victor((futurePoints.x + offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y + offset*(futurePoints.x - currentPoints.x)));
-    	var point_d = new Victor((futurePoints.x - offset*(-futurePoints.y + currentPoints.y)), (futurePoints.y - offset*(futurePoints.x - currentPoints.x)));
-
-      	console.log("Point C is "  + point_c + " and point d is " + point_d);
+      offset_calculate(point_a, point_b);
+      
     }
   }
-  outputToFile();
+
+  //Calualte left and right distances
+  var left_outputs = [];
+  var right_outputs = [];
+  for (var n = 0; n < left_positions.length; n++){
+    if ((n+1) >= left_positions.length ){
+
+    } else {
+      var nextPoint = left_positions[n+1];
+      var currentPoint = left_positions[n];
+
+      var shifted_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
+
+      nextPoint = points[n+1];
+      currentPoint = points[n];
+      var original_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
+
+      var output = (shifted_distance/original_distance) * motor_constant;
+
+      left_outputs.push(output);
+
+      console.log("The left output is "  + output);
+    }
+    
+  }
+  for (var n = 0; n < right_positions.length ; n++){
+    if ((n+1) >= right_positions.length ){
+
+    } else {
+      var nextPoint = right_positions[n+1];
+      var currentPoint = right_positions[n];
+
+      var shifted_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
+      nextPoint = points[n+1];
+      currentPoint = points[n];
+      var original_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
+
+      var output = (shifted_distance/original_distance) * motor_constant;
+
+      right_outputs.push(output);
+
+      console.log("The right output is " + output);
+    }
+  }
+   for (var x = 0; x < left_outputs.length; x++){
+      if (x == 0){
+        var left_position = get_distance(0,0,left_positions[x].x,left_positions[x].y);
+        var right_positions = get_distance(0,0, right_positions[x].x, right_positions[x].y);
+      } else {
+          var left_position = get_distance(left_positions[x-1].x,left_positions[x-1].y,left_positions[x].x,left_positions[x].y);
+          var right_position = get_distance(right_positions[x-1].x, right_positions[x-1].y,right_positions[x].x, right_positions[x].y)
+      }
+
+      outputToFile(left_outputs[x], right_outputs[x], left_position , right_position);
+      console.log("outputting");
+   }
 }
-function offset_calculate(x1,y1,x2,y2){
- //Library Setup
-  var Fraction = algebra.Fraction
-  var Expression = algebra.Expression;
-  var Equation = algebra.Equation;
 
-  //New direction vector between points A and B
-  var AB = new Victor((x2-x1), (y2-y1));
+function offset_calculate(point_a, point_b){
 
+  var abVector = new Victor((point_b.x - point_a.x), (point_b.y - point_a.y)) ;
+  var unitVector = new Victor(abVector.x / (abVector.length()), abVector.y / (abVector.length()));
+  var perpendicularABVector = new Victor(-unitVector.y, unitVector.x);
 
-  //Create new parametric equations for vector AD 
-  var adx = new Expression("x");
-  adx = adx.subtract(x1);
-  var distance = adx;
-  adx = adx.multiply(AB.x);
-  var ady = new Expression("y");
-  ady = ady.subtract(y1);
-  var distance2 = ady;
-  ady = ady.multiply(AB.y);
+  var point_c = new Victor((point_b .x + offset *  perpendicularABVector.x), (point_b .y + offset * perpendicularABVector.y));
+  var point_d = new Victor((point_b.x - offset * perpendicularABVector.x), (point_b .y - offset * perpendicularABVector.y));
+ 
+  var return_array = [point_c, point_d];
 
-
-
-  //Create an expression for dot product
-  var dot_sum = adx.add(ady);
-
-
-
-  //Create and equation for dot product(equals 0 becasue the 2 vectors are perpendicular)
-  var dot_product = new Equation(dot_sum, 0);
-
-
-  //Re-arrange dot_product in terms of x
-  var equation_1 = dot_product.solveFor("x");
-
-  //Create second expression, magnitude of AD
-  var magnitude_expression = distance.multiply(distance);
-
-
-  magnitude_expression = magnitude_expression.add(distance2 .multiply(distance2))
-
-
-  //Set second expression equal to the square of the constant offset value
-  var magnitude_equation = new Equation(magnitude_expression, 4); 
-
-  console.log(magnitude_equation.toString());
-
-
-
-  //Substitute equation 1 into magnitude equation
-  var substituted_equation = magnitude_equation.eval({x: equation_1}); 
-
-
-  //Find the 2 roots of the substituted equation
-  var roots = substituted_equation.solveFor("y");
-
-
-
-  //Cast the roots to string, then convert them to expression objects
-  var point1x = algebra.parse(String(roots[0]));
-  var point2x = algebra.parse(String(roots[1]));
-
-
-  //Subsitute first root into equaiton 1
-  var point1y = equation_1.eval({y: point1x});
-  var point2y = equation_1.eval({y: point2x});
-
-
-  //Convert to Strings
-  point1y = point1y.toString();
-  point2y = point2y.toString();
-
-
-  //Parse result for point1y
-  var flag1 = false;
-  var numerator1 = "";
-  var denominator1 = "";
-
-  for (var i = 0; i < point1y.length; i++) {
-
-	if (point1y.charAt(i) == "/"){
-		flag1 = true;
-		i++;
-	}
-
-	if (flag1 == true){
-		denominator1 = denominator1.concat(String(point1y.charAt(i)));
-	} else {
-		numerator1 = numerator1.concat(String(point1y.charAt(i)));
-	}
-	
-  }
-  numerator1 = parseInt(numerator1);
-  denominator1 = parseInt(denominator1);
-
-  point1y = numerator1/denominator1;
-
-
-
-  //Parse result for point2y
-  var flag2 = false;
-  var numerator2 = "";
-  var denominator2 = "";
-
-  for (var i = 0; i < point2y.length; i++) {
-
-  	if (point2y.charAt(i) == "/"){
-  		flag2 = true;
-  		i++;
-  	}
-
-  	if (flag2 == true){
-  		denominator2 = denominator2.concat(String(point2y.charAt(i)));
-  	} else {
-  		numerator2 = numerator2.concat(String(point2y.charAt(i)));
-  	}
-  	
-  }
-  numerator2 = parseInt(numerator2);
-  denominator2 = parseInt(denominator2);
-
-  point2y = numerator2/denominator2;
-
-  //Setup return array in the format (x1, y1, x2, y2);
-  var return_array = [roots[0], point1y, roots[1], point2y];
+  left_positions.push(point_c);
+  right_positions.push(point_d);
 
   //Return the return array
   return return_array;
@@ -245,14 +190,14 @@ function get_distance(x1, y1, x2, y2) {
 //DO NOT TOUCH OR EDIT
 //IDK HOW IT WORKS BUT IT DOES SO DON'T TOUCH ANTYTHING OR IT WILL BREAK!!!
 itemsNotFormatted = [];
-function outputToFile(){
+function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition){
 	for (var e = 0; e < 100; ++e){
 
 		itemsNotFormatted.push({
-			leftOuput: 1,
-			rightOutput: 1,
-			leftPosition: 1,
-			rightPosition: 1,
+			leftOuput: leftMotorOutput,
+			rightOutput: RightMotorOutput,
+			leftPosition: leftRobotPosition,
+			rightPosition: rightRobotPosition,
 			leftVelocity: 1,
 			rightVelocity: 1
 		});
