@@ -251,8 +251,10 @@ function download(){
   var headers = {
       leftOuptut: 'Left Output', 
       rightOutput: 'Right Output',
+      _ : "",
       leftPosition: 'Left Poistion',
       rightPosition: 'Right Poisiton',
+      __ : "",
       leftVelocity: 'Left Velocity',
       rightVelocity: 'Right Velocity'
 
@@ -267,8 +269,10 @@ function download(){
       itemsFormatted.push({
           leftOuput: item.leftOuput, 
           rightOutput: item.rightOutput,
+          _ : "",
           leftPosition: item.leftPosition,
           rightPosition: item.rightPosition,
+          __ : "",
           leftVelocity: item.leftVelocity,
           rightVelocity: item.rightVelocity
       });
