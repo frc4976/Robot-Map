@@ -10,7 +10,7 @@ var numberOfRows = 0;
 var points= [];
 var scaleValue = 2.417;
 var offset = 0.2;
-var motor_constant = 0.9;
+var motor_constant = 0.3;
 var left_positions = [];
 var right_positions = [];
 
@@ -83,15 +83,14 @@ function calculate(){
       point_a = points[i+1];
       point_b = points[i];
 
-      offset_calculate(point_a, point_b);
+      offset_calculate(point_a, point_b, 0);
 
     }
     else {
       point_a = points[i-1];
       point_b = points[i];
 
-      offset_calculate(point_a, point_b);
-      
+      offset_calculate(point_a, point_b, 1);
     }
   }
 
@@ -100,7 +99,6 @@ function calculate(){
   var right_outputs = [];
   for (var n = 0; n < left_positions.length; n++){
     if ((n+1) >= left_positions.length ){
-
     } else {
       var nextPoint = left_positions[n+1];
       var currentPoint = left_positions[n];
@@ -115,11 +113,11 @@ function calculate(){
 
       left_outputs.push(output);
 
-      console.log("The left output is "  + output);
     }
     
   }
-  console.log("The right positions array is " + right_positions);
+  console.log("the right positons are " + right_positions);
+  console.log("the left positions are " + left_positions);
   for (var n = 0; n < right_positions.length; n++){
     if ((n+1) >= right_positions.length ){
 
@@ -136,7 +134,6 @@ function calculate(){
 
       right_outputs.push(output);
 
-      console.log("The right output is " + output);
     }
   }
    for (var x = 0; x < left_outputs.length; x++){
@@ -144,28 +141,36 @@ function calculate(){
         var left_position = get_distance(0,0,left_positions[x].x,left_positions[x].y);
         var right_position = get_distance(0,0, right_positions[x].x, right_positions[x].y);
       } else {
-          var left_position = get_distance(left_positions[x-1].x,left_positions[x-1].y,left_positions[x].x,left_positions[x].y);
-          var right_position = get_distance(right_positions[x-1].x, right_positions[x-1].y,right_positions[x].x, right_positions[x].y)
+        var left_position = get_distance(left_positions[x-1].x,left_positions[x-1].y,left_positions[x].x,left_positions[x].y);
+        var right_position = get_distance(right_positions[x-1].x, right_positions[x-1].y,right_positions[x].x, right_positions[x].y)
       }
 
       outputToFile(left_outputs[x], right_outputs[x], left_position , right_position);
-      console.log("outputting");
    }
 }
 
-function offset_calculate(point_a, point_b){
+function offset_calculate(point_a, point_b, flag){
 
   var abVector = new Victor((point_b.x - point_a.x), (point_b.y - point_a.y)) ;
   var unitVector = new Victor(abVector.x / (abVector.length()), abVector.y / (abVector.length()));
   var perpendicularABVector = new Victor(-unitVector.y, unitVector.x);
 
+
   var point_c = new Victor((point_b .x + offset *  perpendicularABVector.x), (point_b .y + offset * perpendicularABVector.y));
   var point_d = new Victor((point_b.x - offset * perpendicularABVector.x), (point_b .y - offset * perpendicularABVector.y));
  
+  
   var return_array = [point_c, point_d];
 
-  left_positions.push(point_c);
-  right_positions.push(point_d);
+  if (flag == 0){
+    left_positions.push(point_d);
+    right_positions.push(point_c);
+  } else if (flag == 1){
+    left_positions.push(point_c);
+    right_positions.push(point_d);
+  }
+
+
 
   //Return the return array
   return return_array;
@@ -188,7 +193,6 @@ function get_distance(x1, y1, x2, y2) {
 itemsNotFormatted = [];
 function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition){
   for (var e = 0; e < 100; ++e){
-
     itemsNotFormatted.push({
       leftOuput: leftMotorOutput,
       rightOutput: RightMotorOutput,
