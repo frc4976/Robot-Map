@@ -194,7 +194,7 @@ function get_distance(x1, y1, x2, y2) {
 //IDK HOW IT WORKS BUT IT DOES SO DON'T TOUCH ANTYTHING OR IT WILL BREAK!!!
 itemsNotFormatted = [];
 function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition){
-  for (var e = 0; e < 100; ++e){
+  for (var e = 0; e < 500; ++e){
     itemsNotFormatted.push({
       leftOuput: leftMotorOutput,
       rightOutput: RightMotorOutput,
