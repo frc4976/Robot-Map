@@ -13,6 +13,8 @@ var offset = 0.2;
 var motor_constant = 0.3;
 var left_positions = [];
 var right_positions = [];
+var left_position = 0;
+var right_position = 0;
 
 var leftVector = new Victor(0,0);
 var rightVector = new Victor(0,0);
@@ -140,14 +142,14 @@ function calculate(){
   }
    for (var x = 0; x < left_outputs.length; x++){
       if (x == 0){
-        var left_position = get_distance(0,0,left_positions[x].x,left_positions[x].y);
-        var right_position = get_distance(0,0, right_positions[x].x, right_positions[x].y);
+        left_position = left_position + get_distance(0,0,left_positions[x].x,left_positions[x].y);
+        right_position = right_position + get_distance(0,0, right_positions[x].x, right_positions[x].y);
       } else {
-        var left_position = get_distance(left_positions[x-1].x,left_positions[x-1].y,left_positions[x].x,left_positions[x].y);
-        var right_position = get_distance(right_positions[x-1].x, right_positions[x-1].y,right_positions[x].x, right_positions[x].y)
+        left_position = left_position + get_distance(left_positions[x-1].x,left_positions[x-1].y,left_positions[x].x,left_positions[x].y);
+        right_position = right_position + get_distance(right_positions[x-1].x, right_positions[x-1].y,right_positions[x].x, right_positions[x].y)
       }
 
-      outputToFile(left_outputs[x], right_outputs[x], left_position , right_position);
+      outputToFile(left_outputs[x], right_outputs[x], left_position, right_position);
    }
 }
 
@@ -171,8 +173,6 @@ function offset_calculate(point_a, point_b, flag){
     left_positions.push(point_c);
     right_positions.push(point_d);
   }
-
-
 
   //Return the return array
   return return_array;
