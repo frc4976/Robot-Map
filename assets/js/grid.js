@@ -109,6 +109,8 @@ function calculate(){
       currentPoint = points[n];
       var original_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
 
+      console.log("The shifted distance for the left points is " + shifted_distance);
+
       var output = (shifted_distance/original_distance) * motor_constant;
 
       left_outputs.push(output);
@@ -116,8 +118,6 @@ function calculate(){
     }
     
   }
-  console.log("the right positons are " + right_positions);
-  console.log("the left positions are " + left_positions);
   for (var n = 0; n < right_positions.length; n++){
     if ((n+1) >= right_positions.length ){
 
@@ -129,6 +129,8 @@ function calculate(){
       nextPoint = points[n+1];
       currentPoint = points[n];
       var original_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
+
+      console.log("The distance between the right points is " + shifted_distance);
 
       var output = (shifted_distance/original_distance) * motor_constant;
 
