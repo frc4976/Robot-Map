@@ -134,7 +134,7 @@ function calculate(){
 
       console.log("The distance between the right points is " + shifted_distance);
 
-      var output = (shifted_distance/original_distance) * motor_constant;
+      var output = -1 * (shifted_distance/original_distance) * motor_constant;
 
       right_outputs.push(output);
 
