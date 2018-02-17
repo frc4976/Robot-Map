@@ -29,7 +29,6 @@ var grid = clickableGrid(10,20,function(box,row,col){
 
 });
 
-
 //Append the table to the DOM 
 document.getElementById("table").appendChild(grid);
  
@@ -111,7 +110,6 @@ function calculate(){
       currentPoint = points[n];
       var original_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
 
-      console.log("The shifted distance for the left points is " + shifted_distance);
 
       var output = (shifted_distance/original_distance) * motor_constant;
 
@@ -132,7 +130,6 @@ function calculate(){
       currentPoint = points[n];
       var original_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
 
-      console.log("The distance between the right points is " + shifted_distance);
 
       var output = -1 * (shifted_distance/original_distance) * motor_constant;
 
@@ -141,14 +138,11 @@ function calculate(){
     }
   }
    for (var x = 0; x < left_outputs.length; x++){
-      if (x == 0){
-        left_position = left_position + get_distance(0,0,left_positions[x].x,left_positions[x].y);
-        right_position = right_position + get_distance(0,0, right_positions[x].x, right_positions[x].y);
-      } else {
-        left_position = left_position + get_distance(left_positions[x-1].x,left_positions[x-1].y,left_positions[x].x,left_positions[x].y);
-        right_position = right_position + get_distance(right_positions[x-1].x, right_positions[x-1].y,right_positions[x].x, right_positions[x].y)
-      }
+      left_position = left_position + get_distance(left_positions[x].x,left_positions[x].y,left_positions[x+1].x,left_positions[x+1].y);
+      right_position = right_position + get_distance(right_positions[x].x, right_positions[x].y,right_positions[x+1].x, right_positions[x+1].y);
 
+      console.log("Left position is " + left_position);
+      console.log("Right positon is " + right_position);
       outputToFile(left_outputs[x], right_outputs[x], left_position, right_position);
    }
 }
