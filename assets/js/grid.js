@@ -213,7 +213,7 @@ function add_event(){
 //IDK HOW IT WORKS BUT IT DOES SO DON'T TOUCH ANTYTHING OR IT WILL BREAK!!!
 itemsNotFormatted = [];
 function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition){
-  for (var e = 0; e < 300; ++e){
+  for (var e = 0; e < 425; ++e){
     itemsNotFormatted.push({
       leftOuput: leftMotorOutput,
       rightOutput: RightMotorOutput,
