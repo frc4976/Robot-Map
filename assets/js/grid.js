@@ -148,7 +148,7 @@ function calculate(){
   }
    for (var x = 0; x < left_outputs.length; x++){
       left_position = left_position + get_distance(left_positions[x].x,left_positions[x].y,left_positions[x+1].x,left_positions[x+1].y);
-      right_position = right_position + get_distance(right_positions[x].x, right_positions[x].y,right_positions[x+1].x, right_positions[x+1].y);
+      right_position = right_position - get_distance(right_positions[x].x, right_positions[x].y,right_positions[x+1].x, right_positions[x+1].y);
 
   
       console.log(left_outputs[x] + "," + right_outputs[x] + ",," + left_position + "," + right_position);
