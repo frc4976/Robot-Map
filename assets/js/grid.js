@@ -15,6 +15,8 @@ var left_positions = [];
 var right_positions = [];
 var left_position = 0;
 var right_position = 0;
+var longPresses = [];
+
 
 var leftVector = new Victor(0,0);
 var rightVector = new Victor(0,0);
@@ -47,6 +49,13 @@ function clickableGrid( rows, cols, callback){
                callback(box,r,c);
               }
           })(cell,r,c),false);
+          cell.addEventListener('long-press',(function(box,r,c){
+              return function(){
+                var y = numberOfRows - r - 1;
+                longPresses.push(new Victor(c, y));
+               callback(box,r,c);
+              }
+          })(cell,r,c),false);
       }
   }
   return grid;
@@ -69,6 +78,7 @@ function clean_array(){
 function calculate(){
 
   var clean = clean_array();
+  console.log(longPresses);
 
   //Calcualte left and right offset values
   for (var i = 0; i < points.length; i++) {
@@ -182,6 +192,22 @@ function get_distance(x1, y1, x2, y2) {
    
   return Math.sqrt( xs + ys );
 };
+
+function add_event(){
+  var radios = document.getElementsByName('command');
+
+  for (var i = 0, length = radios.length; i < length; i++)
+  {
+   if (radios[i].checked)
+   {
+    // do whatever you want with the checked radio
+    console.log("add " + String(radios[i]) + " to file");
+
+    // only one radio can be logically checked, don't check the rest
+    break;
+ }
+}
+}
 
 //CSV Output Code
 //DO NOT TOUCH OR EDIT

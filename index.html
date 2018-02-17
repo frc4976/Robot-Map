@@ -8,16 +8,30 @@
 		<script src="assets/js/victor1.js"></script>
 		<script src="assets/js/victor.min.js"></script>
 		<script src="assets/js/algebra-0.2.6.min.js"></script>
+		<script src="assets/js/long_press.js"></script>
 	</head>
 	<body>
 		<header id="header">
 			<a href="index.html" class="logo"><strong>FRC 4976</strong> Autonomous Planning</a>
 		</header>
 		<section id="main">
-			<div id="table"></div>
+			<div id="table" ></div>
 			<div class="inner">
 				<button onclick="calculate()">Calculate</button> 
 				<button onclick="download()">Export to CSV</button> 
+			</div>
+			<div style="float:right">
+				Pause:<input id="checkBox" name="command" id="pause" value="pause"type="radio">
+				<br />
+				Elevator Up:<input id="checkBox" name="command" id="elevator_up" value="elevator_up" type="radio">
+				<br />
+				Elevator down:<input id="checkBox" name="command"  id="elevator_down" value="elevator_down" type="radio">
+				<br />
+				Gripper In:<input id="checkBox" name="command"  id="gripper_in" value="gripper_in" type="radio">
+				<br />
+				Gripper Out:<input id="checkBox" name="command"  id="gripper_out" value="gripper_out" type="radio">
+				<br />
+				<button onclick="add_event()">Add Event</button>
 			</div>
 		</section>
 		<script src="assets/js/grid.js"></script>
