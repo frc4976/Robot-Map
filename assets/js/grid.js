@@ -147,12 +147,25 @@ function calculate(){
     }
   }
    for (var x = 0; x < left_outputs.length; x++){
-      left_position = left_position + get_distance(left_positions[x].x,left_positions[x].y,left_positions[x+1].x,left_positions[x+1].y);
-      right_position = right_position - get_distance(right_positions[x].x, right_positions[x].y,right_positions[x+1].x, right_positions[x+1].y);
+      left_current_position = get_distance(left_positions[x].x,left_positions[x].y,left_positions[x+1].x,left_positions[x+1].y);
+      left_position = left_position + left_current_position;
+      right_current_position = get_distance(right_positions[x].x, right_positions[x].y,right_positions[x+1].x, right_positions[x+1].y);;
+      right_position = right_position - right_current_position; 
 
-  
-      console.log(left_outputs[x] + "," + right_outputs[x] + ",," + left_position + "," + right_position);
-      outputToFile(left_outputs[x], right_outputs[x], left_position, right_position);
+      var current_left_output;
+      var current_right_output;
+      if(left_current_position > right_current_position){
+        current_left_output = left_outputs[x] * 2;
+
+      } else if (right_current_position > left_current_position){
+        current_right_output = right_outputs[x] * 2;
+
+      } else {
+        current_left_output = left_outputs[x];
+        current_right_output = right_outputs[x];
+      }
+      console.log(current_left_output + "," + current_right_output + ",," + left_position + "," + right_position);
+      outputToFile(current_left_output, current_right_output, left_position, right_position);
    }
 }
 
