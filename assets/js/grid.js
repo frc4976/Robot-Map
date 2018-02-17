@@ -78,7 +78,6 @@ function clean_array(){
 function calculate(){
 
   var clean = clean_array();
-  console.log(longPresses);
 
   //Calcualte left and right offset values
   for (var i = 0; i < points.length; i++) {
@@ -151,8 +150,8 @@ function calculate(){
       left_position = left_position + get_distance(left_positions[x].x,left_positions[x].y,left_positions[x+1].x,left_positions[x+1].y);
       right_position = right_position + get_distance(right_positions[x].x, right_positions[x].y,right_positions[x+1].x, right_positions[x+1].y);
 
-      console.log("Left position is " + left_position);
-      console.log("Right positon is " + right_position);
+  
+      console.log(left_outputs[x] + "," + right_outputs[x] + ",," + left_position + "," + right_position);
       outputToFile(left_outputs[x], right_outputs[x], left_position, right_position);
    }
 }
@@ -214,7 +213,7 @@ function add_event(){
 //IDK HOW IT WORKS BUT IT DOES SO DON'T TOUCH ANTYTHING OR IT WILL BREAK!!!
 itemsNotFormatted = [];
 function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition){
-  for (var e = 0; e < 500; ++e){
+  for (var e = 0; e < 300; ++e){
     itemsNotFormatted.push({
       leftOuput: leftMotorOutput,
       rightOutput: RightMotorOutput,
