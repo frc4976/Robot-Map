@@ -9,7 +9,7 @@ var lastClicked;
 var numberOfRows = 0;
 var points= [];
 var scaleValue = 2.417;
-var offset = 0.74 /2;
+var offset = 0.74 / 2;
 var motor_constant = 0.3;
 var left_positions = [];
 var right_positions = [];
