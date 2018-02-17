@@ -154,8 +154,8 @@ function offset_calculate(point_a, point_b, flag){
   var perpendicularABVector = new Victor(-unitVector.y, unitVector.x);
 
 
-  var point_c = new Victor((point_b .x + offset *  perpendicularABVector.x), (point_b .y + offset * perpendicularABVector.y));
-  var point_d = new Victor((point_b.x - offset * perpendicularABVector.x), (point_b .y - offset * perpendicularABVector.y));
+  var point_c = new Victor((point_b .x + offset *  perpendicularABVector.x), (point_b.y + offset * perpendicularABVector.y));
+  var point_d = new Victor((point_b.x - offset * perpendicularABVector.x), (point_b.y - offset * perpendicularABVector.y));
  
   
   var return_array = [point_c, point_d];
