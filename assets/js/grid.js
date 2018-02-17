@@ -155,10 +155,9 @@ function calculate(){
       var current_left_output;
       var current_right_output;
       if(left_current_position > right_current_position){
-        current_left_output = left_outputs[x] * 2;
-
+        current_right_output = right_outputs[x] / 2;
       } else if (right_current_position > left_current_position){
-        current_right_output = right_outputs[x] * 2;
+        current_left_output = left_outputs[x] / 2;
 
       } else {
         current_left_output = left_outputs[x];
