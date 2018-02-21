@@ -23,6 +23,8 @@ var left_position = 0;
 var right_position = 0;
 var longPresses = [];
 var tempCommands = [];
+var commands = [];
+var pointCounter = 0;
 
 
 var leftVector = new Victor(0,0);
@@ -34,7 +36,7 @@ var rightVector = new Victor(0,0);
 var pause = document.querySelector("input[name=pause]");
 pause.addEventListener('change', function() {
     if(this.checked) {
-        tempCommands.push(1);
+        tempCommands.push("pause");
     } else {
         // Checkbox is not checked..
     }
@@ -43,7 +45,7 @@ pause.addEventListener('change', function() {
 var elevator_up = document.querySelector("input[name=elevator_up]");
 elevator_up.addEventListener('change', function() {
     if(this.checked) {
-        tempCommands.push(2);
+        tempCommands.push("Elevator Up");
     } else {
         // Checkbox is not checked..
     }
@@ -52,7 +54,7 @@ elevator_up.addEventListener('change', function() {
 var elevator_down = document.querySelector("input[name=elevator_down]");
 elevator_down.addEventListener('change', function() {
     if(this.checked) {
-        tempCommands.push(3);
+        tempCommands.push("Elevator Down");
     } else {
         // Checkbox is not checked..
     }
@@ -61,7 +63,7 @@ elevator_down.addEventListener('change', function() {
 var gripper_in = document.querySelector("input[name=gripper_in]");
 gripper_in.addEventListener('change', function() {
     if(this.checked) {
-        tempCommands.push(4);
+        tempCommands.push("Gripper In");
     } else {
         // Checkbox is not checked..
     }
@@ -70,7 +72,7 @@ gripper_in.addEventListener('change', function() {
 var gripper_out = document.querySelector("input[name=gripper_out]");
 gripper_out.addEventListener('change', function() {
     if(this.checked) {
-        tempCommands.push(5);
+          tempCommands.push("Gripper Out");
     } else {
         // Checkbox is not checked..
     }
@@ -80,6 +82,12 @@ gripper_out.addEventListener('change', function() {
 var grid = clickableGrid(10,20,function(box,row,col){
   box.className='clicked';
   var y = numberOfRows - row - 1;
+  if (tempCommands.length != 0){
+    commands.push(tempCommands);
+  } else {
+    commands.push(0)
+  } 
+  tempCommands = [];
   points.push(new Victor(col, y));
 
 });
@@ -130,7 +138,6 @@ function clean_array(){
 
 function calculate(){
 
-  console.log(commands);
   var clean = clean_array();
 
   //Calcualte left and right offset values
@@ -214,8 +221,17 @@ function calculate(){
         current_left_output = left_outputs[x];
         current_right_output = right_outputs[x];
       }
+
+
       console.log(current_left_output + "," + current_right_output + ",," + left_position + "," + right_position);
       
+      if (x < commands.length){
+        for (var z = 0; z < commands[x].length; z++){
+            console.log("OUTPUTING!!!!!!");
+            outputToFileOnce(current_left_output, current_right_output, left_position, right_position, commands[x][z]);
+
+        }
+      }
       outputToFile(current_left_output, current_right_output, left_position, right_position, "");
    }
 }
@@ -276,6 +292,17 @@ function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, righ
       command: ""
     });
   }
+}
+function outputToFileOnce(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition, command2){
+  itemsNotFormatted.push({
+    leftOuput: leftMotorOutput,
+    rightOutput: RightMotorOutput,
+    leftPosition: leftRobotPosition,
+    rightPosition: rightRobotPosition,
+    leftVelocity: 1,
+    rightVelocity: 1,
+    command: command2 
+  });
 }
 
 function convertToCSV(objArray) {
