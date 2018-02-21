@@ -5,6 +5,12 @@
   points is an array which stores the vector object of each grid element which has been clicked 
   in chronological order
 */
+var script = document.createElement('script');
+script.src = 'http://code.jquery.com/jquery-1.11.0.min.js';
+script.type = 'text/javascript';
+document.getElementsByTagName('head')[0].appendChild(script);
+
+
 var lastClicked;
 var numberOfRows = 0;
 var points= [];
@@ -16,12 +22,59 @@ var right_positions = [];
 var left_position = 0;
 var right_position = 0;
 var longPresses = [];
+var tempCommands = [];
 
 
 var leftVector = new Victor(0,0);
 var rightVector = new Victor(0,0);
 
 //Encoder 0.0001114 m pulse^-1
+
+//CheckBox selection
+var pause = document.querySelector("input[name=pause]");
+pause.addEventListener('change', function() {
+    if(this.checked) {
+        tempCommands.push(1);
+    } else {
+        // Checkbox is not checked..
+    }
+});
+
+var elevator_up = document.querySelector("input[name=elevator_up]");
+elevator_up.addEventListener('change', function() {
+    if(this.checked) {
+        tempCommands.push(2);
+    } else {
+        // Checkbox is not checked..
+    }
+});
+
+var elevator_down = document.querySelector("input[name=elevator_down]");
+elevator_down.addEventListener('change', function() {
+    if(this.checked) {
+        tempCommands.push(3);
+    } else {
+        // Checkbox is not checked..
+    }
+});
+
+var gripper_in = document.querySelector("input[name=gripper_in]");
+gripper_in.addEventListener('change', function() {
+    if(this.checked) {
+        tempCommands.push(4);
+    } else {
+        // Checkbox is not checked..
+    }
+});
+
+var gripper_out = document.querySelector("input[name=gripper_out]");
+gripper_out.addEventListener('change', function() {
+    if(this.checked) {
+        tempCommands.push(5);
+    } else {
+        // Checkbox is not checked..
+    }
+});
 
 //Create the grid variable, takes parameters for rows, columns and the clicakbleGrid function
 var grid = clickableGrid(10,20,function(box,row,col){
@@ -77,6 +130,7 @@ function clean_array(){
 
 function calculate(){
 
+  console.log(commands);
   var clean = clean_array();
 
   //Calcualte left and right offset values
@@ -86,7 +140,6 @@ function calculate(){
     point_a = 0;
     point_b = 0;
     
-
     //If we are at the last point of the array, do nothing
     if (i == 0){ 
       //
@@ -119,11 +172,9 @@ function calculate(){
       currentPoint = points[n];
       var original_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
 
-
       var output = (shifted_distance/original_distance) * motor_constant;
 
       left_outputs.push(output);
-
     }
     
   }
@@ -138,7 +189,6 @@ function calculate(){
       nextPoint = points[n+1];
       currentPoint = points[n];
       var original_distance = get_distance(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
-
 
       var output = -1 * (shifted_distance/original_distance) * motor_constant;
 
@@ -165,7 +215,8 @@ function calculate(){
         current_right_output = right_outputs[x];
       }
       console.log(current_left_output + "," + current_right_output + ",," + left_position + "," + right_position);
-      outputToFile(current_left_output, current_right_output, left_position, right_position);
+      
+      outputToFile(current_left_output, current_right_output, left_position, right_position, "");
    }
 }
 
@@ -206,26 +257,14 @@ function get_distance(x1, y1, x2, y2) {
 };
 
 function add_event(){
-  var radios = document.getElementsByName('command');
-
-  for (var i = 0, length = radios.length; i < length; i++)
-  {
-   if (radios[i].checked)
-   {
-    // do whatever you want with the checked radio
-    console.log("add " + String(radios[i]) + " to file");
-
-    // only one radio can be logically checked, don't check the rest
-    break;
- }
-}
+  $('input:checkbox').removeAttr('checked');
 }
 
 //CSV Output Code
 //DO NOT TOUCH OR EDIT
 //IDK HOW IT WORKS BUT IT DOES SO DON'T TOUCH ANTYTHING OR IT WILL BREAK!!!
 itemsNotFormatted = [];
-function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition){
+function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition, command2){
   for (var e = 0; e < 243; ++e){
     itemsNotFormatted.push({
       leftOuput: leftMotorOutput,
@@ -233,7 +272,8 @@ function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, righ
       leftPosition: leftRobotPosition,
       rightPosition: rightRobotPosition,
       leftVelocity: 1,
-      rightVelocity: 1
+      rightVelocity: 1,
+      command: ""
     });
   }
 }
@@ -290,12 +330,13 @@ function download(){
       leftOuptut: 'Left Output', 
       rightOutput: 'Right Output',
       _ : "",
-      leftPosition: 'Left Poistion',
-      rightPosition: 'Right Poisiton',
+      leftPosition: 'Left Position',
+      rightPosition: 'Right Posiiton',
       __ : "",
       leftVelocity: 'Left Velocity',
-      rightVelocity: 'Right Velocity'
-
+      rightVelocity: 'Right Velocity',
+      ___ : "",
+      command: "Commands"
   };
 
 
@@ -312,7 +353,9 @@ function download(){
           rightPosition: item.rightPosition,
           __ : "",
           leftVelocity: item.leftVelocity,
-          rightVelocity: item.rightVelocity
+          rightVelocity: item.rightVelocity,
+          ___ : "",
+          command: item.command
       });
   });
 
@@ -320,4 +363,3 @@ function download(){
 
   exportCSVFile(headers, itemsFormatted, fileTitle); // call the exportCSVFile() function to process the JSON and trigger the download
 }
-
