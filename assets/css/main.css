@@ -634,7 +634,7 @@
 
 		.grid td {
 		    cursor:pointer;
-		    height:56px;
+		    height: 28px;
 		    border:1px solid #ccc;
 		    text-align:center;
 		    font-family:sans-serif; font-size:13px
