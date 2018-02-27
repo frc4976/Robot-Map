@@ -79,7 +79,7 @@ gripper_out.addEventListener('change', function() {
 });
 
 //Create the grid variable, takes parameters for rows, columns and the clicakbleGrid function
-var grid = clickableGrid(10,20,function(box,row,col){
+var grid = clickableGrid(20,40,function(box,row,col){
   box.className='clicked';
   var y = numberOfRows - row - 1;
   if (tempCommands.length != 0){
@@ -212,10 +212,18 @@ function calculate(){
       var current_left_output;
       var current_right_output;
       if(left_current_position > right_current_position){
+        //Turning Left
+        // outputToFileRight(-0.6, 0.6, (left_position * 0.5), (right_position *0.5), "");
+
         current_left_output = left_outputs[x] * 1.5;
       } else if (right_current_position > left_current_position){
+        //Turning Right
+        // outputToFileRight(0.6, 0.6, (left_position * 0.5), (right_position *0.5), "");
         current_right_output = right_outputs[x] * 1.5;
       } else {
+        //Sraight
+        // outputToFileStraight(0.6, -0.6, (left_position * 0.5), (right_position *0.5), "");
+
         current_left_output = left_outputs[x];
         current_right_output = right_outputs[x];
       }
@@ -225,11 +233,11 @@ function calculate(){
       if (x < commands.length){
         for (var z = 0; z < commands[x].length; z++){
             console.log("OUTPUTING!!!!!!");
-            outputToFileOnce(current_left_output, current_right_output, left_position, right_position, commands[x][z]);
+            outputToFileOnce(current_left_output, current_right_output, (left_position *0.5), (right_position * 0.5), commands[x][z]);
 
         }
       }
-      outputToFile(current_left_output, current_right_output, left_position, right_position, "");
+      outputToFile(current_left_output, current_right_output, (left_position * 0.5), (right_position *0.5), "");
    }
 }
 
@@ -278,7 +286,45 @@ function add_event(){
 //IDK HOW IT WORKS BUT IT DOES SO DON'T TOUCH ANTYTHING OR IT WILL BREAK!!!
 itemsNotFormatted = [];
 function outputToFile(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition, command2){
-  for (var e = 0; e < 243; ++e){
+  for (var e = 0; e < 121; ++e){
+    itemsNotFormatted.push({
+      leftOuput: leftMotorOutput,
+      rightOutput: RightMotorOutput,
+      leftPosition: leftRobotPosition,
+      rightPosition: rightRobotPosition,
+      leftVelocity: 1,
+      rightVelocity: 1,
+      command: ""
+    });
+  }
+}
+function outputToFileStraight(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition, command2){
+  for (var e = 0; e < 121; ++e){
+    itemsNotFormatted.push({
+      leftOuput: leftMotorOutput,
+      rightOutput: RightMotorOutput,
+      leftPosition: leftRobotPosition,
+      rightPosition: rightRobotPosition,
+      leftVelocity: 1,
+      rightVelocity: 1,
+      command: ""
+    });
+  }
+}
+function outputToFileLeft(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition, command2){
+  for (var e = 0; e < 121; ++e){
+    itemsNotFormatted.push({
+      leftOuput: leftMotorOutput,
+      rightOutput: RightMotorOutput,
+      leftPosition: leftRobotPosition,
+      rightPosition: rightRobotPosition,
+      leftVelocity: 1,
+      rightVelocity: 1,
+      command: ""
+    });
+  }
+}function outputToFileRight(leftMotorOutput, RightMotorOutput, leftRobotPosition, rightRobotPosition, command2){
+  for (var e = 0; e < 121; ++e){
     itemsNotFormatted.push({
       leftOuput: leftMotorOutput,
       rightOutput: RightMotorOutput,
